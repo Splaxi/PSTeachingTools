@@ -143,9 +143,9 @@ Copyright (C) Microsoft Corporation. All rights reserved.
      
                 &$PauseCharacterCheck
                 
-                if($($command[$i]) -eq "þ") {
+                if ($($command[$i]) -eq "þ") {
                     continue
-                    }
+                }
 
                 #write the character
                 Write-Verbose "Writing character $($command[$i])"
@@ -167,12 +167,13 @@ Copyright (C) Microsoft Corporation. All rights reserved.
             If ((PauseIt) -eq "quit") {Return}
             Write-host "`r"
             #execute the command unless -NoExecute was specified
+
+            $command = $command -replace "þ", ""
+
             if (-NOT $NoExecute) {
-                $command = $command -replace "þ", ""
                 Invoke-Expression $command | Out-Default
             }
             else {
-                $command = $command -replace "þ", ""
                 Write-Host $command -ForegroundColor Cyan
             }
         } #IF SINGLE COMMAND
@@ -187,10 +188,21 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         #FIRST LINE OF MULTILINE
         elseif ($StartMulti) {
             for ($i = 0; $i -lt $command.length; $i++) {
-                if ($IncludeTypo -AND ($(&$Interval) -ge ($RandomMaximum - 5)))
-                { &$Typo } 
-                else { write-host $command[$i] -NoNewline} #else
+                &$PauseCharacterCheck
+                
+                if ($($command[$i]) -eq "þ") {
+                    continue
+                }
+
+                if ($IncludeTypo -AND ($(&$Interval) -ge ($RandomMaximum - 5))) { 
+                    &$Typo 
+                } 
+                else { 
+                    write-host $command[$i] -NoNewline
+                } 
+                
                 start-sleep -Milliseconds $(&$Interval)
+                
                 #only check for a pipe if we're not at the last character
                 #because we're going to pause anyway
                 if ($i -lt $command.length - 1) {
@@ -201,13 +213,13 @@ Copyright (C) Microsoft Corporation. All rights reserved.
             $StartMulti = $False
        
             #remove the backtick line continuation character if found
-            if ($command.contains('`')) {
-                $command = $command.Replace('`', "")
-            }
+            # if ($command.contains('`')) {
+            #     $command = $command.Replace('`', "")
+            # }
+
             #add the command to the multiline variable
             $multi += " $command"
-            #     if (!$command.Endswith('{')) { $multi += ";" }
-            if ($command -notmatch ",$|{$|}$|\|$|\($") { $multi += " ; " }
+            if ($command -notmatch ',$|{$|}$|\|$|\($|`$') { $multi += " ; " }
             If ((PauseIt) -eq "quit") {Return}
         
         } #elseif
@@ -218,8 +230,15 @@ Copyright (C) Microsoft Corporation. All rights reserved.
             $NoMultiLine = $True
             If ((PauseIt) -eq "quit") {Return}
             #execute the command unless -NoExecute was specified
+
             Write-Host "`r"
+
+
+            $multi = $multi -replace "þ", ""
+            $multi = $multi -replace '`', ""
+            
             if (-NOT $NoExecute) {
+            
                 Invoke-Expression $multi | Out-Default
             }
             else {
@@ -232,23 +251,35 @@ Copyright (C) Microsoft Corporation. All rights reserved.
             Write-Host ">> " -NoNewLine
             If ((PauseIt) -eq "quit") {Return}
             for ($i = 0; $i -lt $command.length; $i++) {
-                if ($IncludeTypo -AND ($(&$Interval) -ge ($RandomMaximum - 5)))
-                { &$Typo  } 
-                else { Write-Host $command[$i] -NoNewline }
+
+                &$PauseCharacterCheck
+                
+                if ($($command[$i]) -eq "þ") {
+                    continue
+                }
+
+                if ($IncludeTypo -AND ($(&$Interval) -ge ($RandomMaximum - 5)))                { 
+                    &$Typo  
+                } 
+                else { 
+                    Write-Host $command[$i] -NoNewline 
+                }
+
                 Start-Sleep -Milliseconds $(&$Interval)
                 &$PipeCheck
             } #for
    
             #remove the backtick line continuation character if found
-            if ($command.contains('`')) {
-                $command = $command.Replace('`', "")
-            }
+            # if ($command.contains('`')) {
+            #     $command = $command.Replace('`', "")
+            # }
+
             #add the command to the multiline variable and include the line break 
             #character 
             $multi += " $command"
             #  if (!$command.Endswith('{')) { $multi += ";" }  
     
-            if ($command -notmatch ",$|{$|\|$|\($") {
+            if ($command -notmatch ',$|{$|\|$|\($|`$') {
                 $multi += " ; "
                 #$command
             }
