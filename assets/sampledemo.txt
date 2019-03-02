@@ -1,6 +1,7 @@
-#this is a sample demo file for Start-TypedDemo
+﻿#this is a sample demo file for Start-TypedDemo
 
 get-date
+get-date þ-date þ2019
 get-process | where-object {$_.WS -ge 10MB} 
 ::
 get-process | 

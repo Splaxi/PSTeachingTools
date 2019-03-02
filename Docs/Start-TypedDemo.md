@@ -30,6 +30,8 @@ Start-TypedDemo [-File] <String> [-Pause <Int32>] [-Transcript <String>] [-NoExe
 
 This command simulates an interactive PowerShell session. It will process a text file of PowerShell commands. The function will insert your prompt and "type" out each command when you press any key. At the end of the typed command or whenever a pipe character is inserted, the script will pause. Press Enter or any key to continue. If it is the end of the command pressing Enter will execute the command.
 
+There is a special pause character that will not by printed to the console: "þ". This helps you pause at different parts of your command typing to enable you explaining something, before continuing the typing.
+
 Use the -NoExecute parameter to run through the demo without executing any commands.
 
 Commented lines will be skipped.
