@@ -1,4 +1,4 @@
-
+﻿
 Function Start-TypedDemo {
     [cmdletBinding(DefaultParameterSetName = "Random")]
     [Alias("std")]
@@ -118,6 +118,13 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         }
     } #end PipeCheck scriptblock
 
+    $PauseCharacterCheck = {
+        # Write-Verbose "`$`$Inside: $($command[$i])"      
+        If ($command[$i] -eq "þ") {
+            If ((PauseIt) -eq "quit") {Return}
+        }
+    } #end PauseCharacterCheck scriptblock
+
     Write-Verbose "Processing commands"
     foreach ($command in $commands) {
         #trim off any spaces
@@ -134,6 +141,12 @@ Copyright (C) Microsoft Corporation. All rights reserved.
             Write-Verbose "single line command"          
             for ($i = 0; $i -lt $command.length; $i++) {
      
+                &$PauseCharacterCheck
+                
+                if($($command[$i]) -eq "þ") {
+                    continue
+                    }
+
                 #write the character
                 Write-Verbose "Writing character $($command[$i])"
                 Write-Host $command[$i] -NoNewline
@@ -155,9 +168,11 @@ Copyright (C) Microsoft Corporation. All rights reserved.
             Write-host "`r"
             #execute the command unless -NoExecute was specified
             if (-NOT $NoExecute) {
+                $command = $command -replace "þ", ""
                 Invoke-Expression $command | Out-Default
             }
             else {
+                $command = $command -replace "þ", ""
                 Write-Host $command -ForegroundColor Cyan
             }
         } #IF SINGLE COMMAND
