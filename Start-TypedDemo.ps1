@@ -139,7 +139,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         }
     } #end PauseCharacterCheck scriptblock
 
-    $color = $colorCommandName
 
     Write-Verbose "Processing commands"
     foreach ($command in $commands) {
@@ -155,6 +154,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         $firstSpace = $false
         $firstQoute = $false
         $firstPipe = $false
+
+    $color = $colorCommandName
 
         # Write-Host "Hit foreach"
         #SINGLE LINE COMMAND
