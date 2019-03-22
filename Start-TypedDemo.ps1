@@ -10,94 +10,54 @@ Function Start-TypedDemo {
         [ValidateScript( {$_ -gt 0})]
         [Parameter(ParameterSetName = "Static")]
         [int]$Pause = 80,
-        [Parameter(ParameterSetName = "Random")]
-        [ValidateScript( {$_ -gt 0})]
-        [int]$RandomMinimum = 50,
-        [Parameter(ParameterSetName = "Random")]
-        [ValidateScript( {$_ -gt 0})]
-        [int]$RandomMaximum = 140,
-        [Parameter(ParameterSetName = "Random")]
-        [string]$Transcript,
         [switch]$NoExecute,
-        [switch]$SilentRun,
-        [switch]$NewSession
+        [switch]$SilentRun
     )
 
-    $colorParmsNotFound = "Red"
     $colorCommandName = "Yellow"
-    $colorMandatoryParam = "Yellow"
     $colorParam = "DarkGray"
-    $colorFoundAsterisk = "Green"
-    $colorNotFoundAsterisk = "Magenta"
     $colParmValue = "DarkCyan"
-    $colorEqualSign = "DarkGray"
     $colorVariable = "Green"
     $colorText = "White"
-    $colorCommandNameSplat = "Yellow"
-    $colorComment = "DarkGreen"
 
-    
-    #this is an internal function so I'm not worried about the name
+    $colorOperator = "DarkGray"
+
+    $operatorList = @("+", "/", "*")
+
     Function PauseIt {
-        [cmdletbinding()]
+        [CmdletBinding()]
         Param()
-        Write-Verbose "PauseIt"
 
-        #wait for a key press
         $Running = $true
-        #keep looping until a key is pressed
+
         While ($Running) {
             if ($host.ui.RawUi.KeyAvailable) {
                 $key = $host.ui.RawUI.ReadKey("NoEcho,IncludeKeyDown")
                 if ($key) {
-                    $Running = $False  
+                    $Running = $False
+                    
                     #check the value and if it is q or ESC, then bail out
                     if ($key -match "q|27") {
                         Write-Host "`r"
                         Return "quit"
-                    } #if match q|27
-                } #if $key
-            } #if key available
+                    }
+                }
+            }
+
             Start-Sleep -millisecond 100
-        } #end While
-    } #PauseIt function
+        }
+    }
 
     #abort if running in the ISE
     if ($host.name -match "PowerShell ISE") {
+        #Write-PSFMessage -Level Host -Message "" -Target $Var
+        
         Write-Warning "This will not work in the ISE. Use the PowerShell console host."
         Return
     }
 
     Clear-Host
 
-    if ($NewSession) {
-        #simulate a new PowerShell session
-        #define a set of coordinates
-        $z = new-object System.Management.Automation.Host.Coordinates 0, 0
-        #year is no longer part of the output
-        #$year = '2016'
-
-        $header = @"
-Windows PowerShell
-Copyright (C) Microsoft Corporation. All rights reserved.
-`r
-"@
-
-        Write-Host $header
-    } #if new session
-
-    #Start a transcript if requested
-    $RunningTranscript = $False
-
-    if ($Transcript) {
-        Try {
-            Start-Transcript -Path $Transcript -ErrorAction Stop | Out-Null
-            $RunningTranscript = $True
-        }
-        Catch {
-            Write-Warning "Could not start a transcript. One may already be running."
-        }
-    }
     #strip out all comments and blank lines
     Write-Verbose "Getting commands from $file"
 
