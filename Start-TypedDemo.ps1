@@ -151,6 +151,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         }
    
         $firstSpace = $false
+        $firstQoute = $false
+
         $color = $colorCommandName
         #SINGLE LINE COMMAND
         if ($command -ne "::" -AND $NoMultiLine) {
@@ -171,8 +173,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                     }
                     {$_ -in "-", "–"} {
                         if($firstSpace) {
-                            #Dark Grey
-                            $color = $colorParam
+                            if(-not ($firstQoute)) {
+                                #Dark Grey
+                                $color = $colorParam
+                            }
                         }
                     }
                     "$"{
@@ -180,16 +184,21 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                         $color = $colorVariable
                     }
                     '"' {
+                        if(-not ($firstQoute)) {
+                            $firstQoute = $true
+                        }else {
+                            $firstQoute = $false
+                        }
+
                         $color = $colParmValue
                     }
                 }
                 
-                Write-Verbose "$color"
                 $char = $command[$i]
+
                 #write the character
-                #Write-Verbose "Writing character $($command[$i])"
-                # Write-Host $command[$i] -NoNewline -ForegroundColor Yellow
                 Write-PSFHostColor -String "<c='$color'>$char</c>" -NoNewLine
+
                 #insert a pause to simulate typing
                 Start-sleep -Milliseconds $(&$Interval)
      
@@ -233,11 +242,42 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                     continue
                 }
 
+                switch($($command[$i])) {
+                    " " {
+                        $firstSpace = $true
+                        #White
+                        $color = $colorText
+                    }
+                    {$_ -in "-", "–"} {
+                        if($firstSpace) {
+                            if(-not ($firstQoute)) {
+                                #Dark Grey
+                                $color = $colorParam
+                            }
+                        }
+                    }
+                    "$"{
+                        #Green
+                        $color = $colorVariable
+                    }
+                    '"' {
+                        if(-not ($firstQoute)) {
+                            $firstQoute = $true
+                        }else {
+                            $firstQoute = $false
+                        }
+
+                        $color = $colParmValue
+                    }
+                }
+                
+                $char = $command[$i]
+
                 if ($IncludeTypo -AND ($(&$Interval) -ge ($RandomMaximum - 5))) {
                     &$Typo
                 }
                 else {
-                    write-host $command[$i] -NoNewline
+                    Write-PSFHostColor -String "<c='$color'>$char</c>" -NoNewLine
                 }
                 
                 start-sleep -Milliseconds $(&$Interval)
@@ -250,11 +290,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
             } #for
     
             $StartMulti = $False
-       
-            #remove the backtick line continuation character if found
-            # if ($command.contains('`')) {
-            #     $command = $command.Replace('`', "")
-            # }
 
             #add the command to the multiline variable
             $multi += " $command"
@@ -297,11 +332,47 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                     continue
                 }
 
+                switch($($command[$i])) {
+                    {$_ -in " ", "|"} {
+                        $firstSpace = $true
+                        #White
+                        $color = $colorText
+                    }
+                    {$_ -in "-", "–"} {
+                        # if($firstSpace) {
+                            if(-not ($firstQoute)) {
+                                #Dark Grey
+                                $color = $colorParam
+                            }
+                        # }
+                    }
+                    "$"{
+                        #Green
+                        $color = $colorVariable
+                    }
+                    {$_ -in '"', "'"} {
+                        if(-not ($firstQoute)) {
+                            $firstQoute = $true
+                        }else {
+                            $firstQoute = $false
+                        }
+
+                        $color = $colParmValue
+                    }
+                    default {
+                        $color = $colorCommandName
+                    }
+                }
+                
+                $char = $command[$i]
+
                 if ($IncludeTypo -AND ($(&$Interval) -ge ($RandomMaximum - 5)))                { 
                     &$Typo  
                 } 
                 else { 
-                    Write-Host $command[$i] -NoNewline 
+                    # Write-Host $command[$i] -NoNewline 
+                    Write-PSFHostColor -String "<c='$color'>$char</c>" -NoNewLine
+
                 }
 
                 Start-Sleep -Milliseconds $(&$Interval)
