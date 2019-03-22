@@ -76,27 +76,23 @@ Function Start-TypedDemo {
     }
 
     Write-Verbose "Defining PipeCheck Scriptblock"
-    #define a scriptblock to pause at a | character in case an explanation is needed
     $PipeCheck = {
         if ($command[$i] -eq "|") {
             If ((PauseIt) -eq "quit") {Return}
         }
-    } #end PipeCheck scriptblock
+    }
 
     $PauseCharacterCheck = {
-        # Write-Verbose "`$`$Inside: $($command[$i])"      
         If ($command[$i] -eq "þ") {
             If ((PauseIt) -eq "quit") {Return}
         }
-    } #end PauseCharacterCheck scriptblock
+    }
 
-
-    Write-Verbose "Processing commands"
     foreach ($command in $commands) {
-        #trim off any spaces
         $command = $command.Trim()
   
         $count++
+
         #pause until a key is pressed which will then process the next command
         if ($NoMultiLine) {
             If ((PauseIt) -eq "quit") {Return}
