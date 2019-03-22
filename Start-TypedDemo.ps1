@@ -171,11 +171,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
                 switch($($command[$i])) {
                     " " {
-                        if(-not ($firstPipe))
-                        {
-                        $firstSpace = $true
-                        #White
-                        $color = $colorText
+                        if(-not ($firstPipe) -and (-not ($firstQoute))){
+                            $firstSpace = $true
+                            #White
+                            $color = $colorText
                         }
                     }
                     "|" {
