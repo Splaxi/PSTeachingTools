@@ -354,9 +354,11 @@ Function Start-TypedDemo {
                         }
                     }
                     "|" {
-                        $commandSeparatorActive = $true
-                        $firstSpace = $false
-                        $color = $colorText
+                        if(-not ($firstQuote)) {
+                            $commandSeparatorActive = $true
+                            $firstSpace = $false
+                            $color = $colorText
+                        }
                     }
                     ";" {
                         if(-not ($firstQuote)) {
@@ -371,22 +373,27 @@ Function Start-TypedDemo {
                     }
                     {$_ -in "-", "–"} {
                         if(($firstSpace) -or ($i -eq 0)) {
-
-                        if(-not ($firstQuote)) {
-                            #Dark Grey
-                            $color = $colorParam
+                            if(-not ($firstQuote)) {
+                                #Dark Grey
+                                $color = $colorParam
+                            }
                         }
-                    }
                     }
                     "$"{
                         #Green
-                        $color = $colorVariable
+                        if(-not ($firstQuote)) {
+                            $color = $colorVariable
+                        }
                     }
                     {$_ -in '"', "'"} {
                         if(-not ($firstQuote)) {
                             $firstQuote = $true
+                            $QuoteChar = $_
                         }else {
-                            $firstQuote = $false
+                            if($QuoteChar -eq $_) {
+                                $firstQuote = $false
+                                $QuoteChar = ""
+                            }
                         }
 
                         $color = $colParmValue
