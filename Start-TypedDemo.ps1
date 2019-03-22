@@ -139,6 +139,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         }
     } #end PauseCharacterCheck scriptblock
 
+    $color = $colorCommandName
+
     Write-Verbose "Processing commands"
     foreach ($command in $commands) {
         #trim off any spaces
@@ -154,7 +156,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         $firstQoute = $false
         $firstPipe = $false
 
-        $color = $colorCommandName
+        # Write-Host "Hit foreach"
         #SINGLE LINE COMMAND
         if ($command -ne "::" -AND $NoMultiLine) {
             Write-Verbose "single line command"
@@ -323,6 +325,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         #END OF MULTILINE
         elseif ($command -eq "::" -AND !$NoMultiLine) {
             $firstSpace = $false
+            $color = $colorCommandName
             
             Write-host "`r"
             Write-Host ">> " -NoNewline
@@ -347,6 +350,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         #NESTED PROMPTS
         else {
             $firstSpace = $false
+            $color = $colorCommandName
 
             Write-Host "`r"
             Write-Host ">> " -NoNewLine
@@ -373,15 +377,12 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                     '`' {
                         $previousColor = $color
                         $color = $colorText
-                        Write-Verbose "$previousColor"
                     }
                     {$_ -in "-", "–"} {
-                        #if($firstSpace) {
                             if(-not ($firstQoute)) {
                                 #Dark Grey
                                 $color = $colorParam
                             }
-                        #}
                     }
                     "$"{
                         #Green
@@ -398,6 +399,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                     }
                     default {
                         if($firstPipe) {
+                            Write-Host "Hit yellow"
                             $color = $colorCommandName
                             $firstPipe = $false
                         }
@@ -415,6 +417,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
                     if($char -eq '`') {
                         $color = $previousColor
+                    }elseif($char -eq '|') {
+                        $color = $colorCommandName
                     }
                 }
 
