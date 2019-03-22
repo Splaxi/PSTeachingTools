@@ -417,8 +417,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
                     if($char -eq '`') {
                         $color = $previousColor
-                    }elseif($char -eq '|') {
-                        $color = $colorCommandName
                     }
                 }
 
