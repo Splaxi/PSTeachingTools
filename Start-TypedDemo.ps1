@@ -231,9 +231,11 @@ Function Start-TypedDemo {
                         }
                     }
                     "|" {
-                        $commandSeparatorActive = $true
-                        $firstSpace = $false
-                        $color = $colorText
+                        if(-not ($firstQuote)) {
+                            $commandSeparatorActive = $true
+                            $firstSpace = $false
+                            $color = $colorText
+                        }
                     }
                     ";" {
                         if(-not ($firstQuote)) {
@@ -252,13 +254,19 @@ Function Start-TypedDemo {
                     }
                     "$"{
                         #Green
-                        $color = $colorVariable
+                        if(-not ($firstQuote)) {
+                            $color = $colorVariable
+                        }
                     }
                     {$_ -in '"', "'"} {
                         if(-not ($firstQuote)) {
                             $firstQuote = $true
+                            $QuoteChar = $_
                         }else {
-                            $firstQuote = $false
+                            if($QuoteChar -eq $_) {
+                                $firstQuote = $false
+                                $QuoteChar = ""
+                            }
                         }
 
                         $color = $colParmValue
