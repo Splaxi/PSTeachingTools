@@ -99,8 +99,9 @@ Function Start-TypedDemo {
         }
    
         $firstSpace = $false
-        $firstQoute = $false
-        $firstPipe = $false
+        $firstQuote = $false
+        $QuoteChar = ""
+        $commandSeparatorActive = $false
 
         $color = $colorCommandName
 
@@ -118,27 +119,29 @@ Function Start-TypedDemo {
 
                 switch($($command[$i])) {
                     " " {
-                        if(-not ($firstPipe) -and (-not ($firstQoute))){
+                        if(-not ($commandSeparatorActive) -and (-not ($firstQuote))){
                             $firstSpace = $true
                             #White
                             $color = $colorText
                         }
                     }
                     "|" {
-                        $firstPipe = $true
-                        $firstSpace = $false
-                        $color = $colorText
+                        if(-not ($firstQuote)) {
+                            $commandSeparatorActive = $true
+                            $firstSpace = $false
+                            $color = $colorText
+                        }
                     }
                     ";" {
-                        if(-not ($firstQoute)) {
-                            $firstPipe = $true
+                        if(-not ($firstQuote)) {
+                            $commandSeparatorActive = $true
                             $firstSpace = $false
                             $color = $colorText
                         }
                     }
                     {$_ -in "-", "–"} {
                         if($firstSpace) {
-                            if(-not ($firstQoute)) {
+                            if(-not ($firstQuote)) {
                                 #Dark Grey
                                 $color = $colorParam
                             }
@@ -149,18 +152,22 @@ Function Start-TypedDemo {
                         $color = $colorVariable
                     }
                     {$_ -in '"', "'"} {
-                        if(-not ($firstQoute)) {
-                            $firstQoute = $true
+                        if(-not ($firstQuote)) {
+                            $firstQuote = $true
+                            $QuoteChar = $_
                         }else {
-                            $firstQoute = $false
+                            if($QuoteChar -eq $_) {
+                                $firstQuote = $false
+                                $QuoteChar = ""
+                            }
                         }
 
                         $color = $colParmValue
                     }
                     default {
-                        if($firstPipe) {
+                        if($commandSeparatorActive) {
                             $color = $colorCommandName
-                            $firstPipe = $false
+                            $commandSeparatorActive = $false
                         }
                     }
                 }
@@ -215,27 +222,27 @@ Function Start-TypedDemo {
 
                 switch($($command[$i])) {
                     " " {
-                        if(-not ($firstPipe) -and (-not ($firstQoute))){
+                        if(-not ($commandSeparatorActive) -and (-not ($firstQuote))){
                             $firstSpace = $true
                             #White
                             $color = $colorText
                         }
                     }
                     "|" {
-                        $firstPipe = $true
+                        $commandSeparatorActive = $true
                         $firstSpace = $false
                         $color = $colorText
                     }
                     ";" {
-                        if(-not ($firstQoute)) {
-                            $firstPipe = $true
+                        if(-not ($firstQuote)) {
+                            $commandSeparatorActive = $true
                             $firstSpace = $false
                             $color = $colorText
                         }
                     }
                     {$_ -in "-", "–"} {
                         if($firstSpace) {
-                            if(-not ($firstQoute)) {
+                            if(-not ($firstQuote)) {
                                 #Dark Grey
                                 $color = $colorParam
                             }
@@ -246,18 +253,18 @@ Function Start-TypedDemo {
                         $color = $colorVariable
                     }
                     {$_ -in '"', "'"} {
-                        if(-not ($firstQoute)) {
-                            $firstQoute = $true
+                        if(-not ($firstQuote)) {
+                            $firstQuote = $true
                         }else {
-                            $firstQoute = $false
+                            $firstQuote = $false
                         }
 
                         $color = $colParmValue
                     }
                     default {
-                        if($firstPipe) {
+                        if($commandSeparatorActive) {
                             $color = $colorCommandName
-                            $firstPipe = $false
+                            $commandSeparatorActive = $false
                         }
                     }
                 }
@@ -330,20 +337,20 @@ Function Start-TypedDemo {
 
                 switch($($command[$i])) {
                     " " {
-                        if(-not ($firstPipe) -and (-not ($firstQoute))){
+                        if(-not ($commandSeparatorActive) -and (-not ($firstQuote))){
                             $firstSpace = $true
                             #White
                             $color = $colorText
                         }
                     }
                     "|" {
-                        $firstPipe = $true
+                        $commandSeparatorActive = $true
                         $firstSpace = $false
                         $color = $colorText
                     }
                     ";" {
-                        if(-not ($firstQoute)) {
-                            $firstPipe = $true
+                        if(-not ($firstQuote)) {
+                            $commandSeparatorActive = $true
                             $firstSpace = $false
                             $color = $colorText
                         }
@@ -355,7 +362,7 @@ Function Start-TypedDemo {
                     {$_ -in "-", "–"} {
                         if(($firstSpace) -or ($i -eq 0)) {
 
-                        if(-not ($firstQoute)) {
+                        if(-not ($firstQuote)) {
                             #Dark Grey
                             $color = $colorParam
                         }
@@ -366,71 +373,50 @@ Function Start-TypedDemo {
                         $color = $colorVariable
                     }
                     {$_ -in '"', "'"} {
-                        if(-not ($firstQoute)) {
-                            $firstQoute = $true
+                        if(-not ($firstQuote)) {
+                            $firstQuote = $true
                         }else {
-                            $firstQoute = $false
+                            $firstQuote = $false
                         }
 
                         $color = $colParmValue
                     }
                     default {
-                        if($firstPipe) {
+                        if($commandSeparatorActive) {
                             $color = $colorCommandName
-                            $firstPipe = $false
+                            $commandSeparatorActive = $false
                         }
                     }
                 }
                 
                 $char = $command[$i]
 
-                if ($IncludeTypo -AND ($(&$Interval) -ge ($RandomMaximum - 5)))                { 
-                    &$Typo  
-                } 
-                else { 
-                    # Write-Host $command[$i] -NoNewline 
                     Write-PSFHostColor -String "<c='$color'>$char</c>" -NoNewLine
 
                     if($char -eq '`') {
                         $color = $previousColor
                     }
-                }
 
                 Start-Sleep -Milliseconds $(&$Interval)
                 &$PipeCheck
             } #for
    
-            #remove the backtick line continuation character if found
-            # if ($command.contains('`')) {
-            #     $command = $command.Replace('`', "")
-            # }
 
             #add the command to the multiline variable and include the line break 
-            #character 
+            #character
             $multi += " $command"
-            #  if (!$command.Endswith('{')) { $multi += ";" }  
     
             if ($command -notmatch ',$|{$|\|$|\($|`$') {
                 $multi += " ; "
-                #$command
             }
-      
-        } #else nested prompts  
+        }
    
         #reset the prompt unless we've just done the last command
         if (($count -lt $commands.count) -AND ($NoMultiLine)) {
-            Write-Host $(prompt) -NoNewline 
-        } 
-    
-    } #foreach  
-  
-    #stop a transcript if it is running
-    if ($RunningTranscript) {
-        #stop this transcript if it is running
-        Stop-Transcript | Out-Null
+            Write-Host $(prompt) -NoNewline
+        }
     }
-  
-} #function
+}
 
 
 
