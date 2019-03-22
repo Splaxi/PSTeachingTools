@@ -182,6 +182,13 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                         $firstSpace = $false
                         $color = $colorText
                     }
+                    ";" {
+                        if(-not ($firstQoute)) {
+                            $firstPipe = $true
+                            $firstSpace = $false
+                            $color = $colorText
+                        }
+                    }
                     {$_ -in "-", "–"} {
                         if($firstSpace) {
                             if(-not ($firstQoute)) {
@@ -271,6 +278,13 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                         $firstPipe = $true
                         $firstSpace = $false
                         $color = $colorText
+                    }
+                    ";" {
+                        if(-not ($firstQoute)) {
+                            $firstPipe = $true
+                            $firstSpace = $false
+                            $color = $colorText
+                        }
                     }
                     {$_ -in "-", "–"} {
                         if($firstSpace) {
@@ -381,6 +395,13 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                         $firstSpace = $false
                         $color = $colorText
                     }
+                    ";" {
+                        if(-not ($firstQoute)) {
+                            $firstPipe = $true
+                            $firstSpace = $false
+                            $color = $colorText
+                        }
+                    }
                     '`' {
                         $previousColor = $color
                         $color = $colorText
@@ -409,7 +430,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                     }
                     default {
                         if($firstPipe) {
-                            Write-Host "Hit yellow"
                             $color = $colorCommandName
                             $firstPipe = $false
                         }
