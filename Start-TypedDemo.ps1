@@ -379,10 +379,13 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                         $color = $colorText
                     }
                     {$_ -in "-", "–"} {
-                            if(-not ($firstQoute)) {
-                                #Dark Grey
-                                $color = $colorParam
-                            }
+                        if(($firstSpace) -or ($i -eq 0)) {
+
+                        if(-not ($firstQoute)) {
+                            #Dark Grey
+                            $color = $colorParam
+                        }
+                    }
                     }
                     "$"{
                         #Green
