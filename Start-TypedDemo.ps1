@@ -10,8 +10,8 @@ Function Start-TypedDemo {
         [ValidateScript( {$_ -gt 0})]
         [Parameter(ParameterSetName = "Static")]
         [int]$Pause = 80,
-        [switch]$NoExecute,
-        [switch]$SilentRun
+        [ValidateSet('Execute', 'NoExecute', 'SilentRun')]
+        [string]$RunMode = "Execute"
     )
 
     $colorCommandName = "Yellow"
@@ -61,7 +61,7 @@ Function Start-TypedDemo {
     #strip out all comments and blank lines
     Write-Verbose "Getting commands from $file"
 
-    $commands = Get-Content -Path $file | Where-Object {$_ -notmatch "#" -AND $_ -match "\w|::|{|}|\(|\)"}
+    $commands = Get-Content -Path $file | Where-Object {$_ -NotMatch "#" -AND $_ -Match "\w|::|{|}|\(|\)"}
 
     $count = 0
 
@@ -189,10 +189,10 @@ Function Start-TypedDemo {
 
             $command = $command -replace "þ", ""
 
-            if ((-not $NoExecute) -and (-not $SilentRun)) {
+            if ($RunMode -eq "Execute") {
                 Invoke-Expression $command | Out-Default
             }
-            elseif($NoExecute) {
+            elseif($RunMode -eq "NoExecute") {
                 Write-Host $command -ForegroundColor Cyan
             }
         } #IF SINGLE COMMAND
@@ -305,10 +305,10 @@ Function Start-TypedDemo {
             $multi = $multi -replace "þ", ""
             $multi = $multi -replace '`', ""
             
-            if ((-not $NoExecute) -and (-not $SilentRun)) {
+            if ($RunMode -eq "Execute") {
                 Invoke-Expression $multi | Out-Default
             }
-            elseif($NoExecute) {
+            elseif($RunMode -eq "NoExecute") {
                 Write-Host $multi -ForegroundColor Cyan
             }
         }  #elseif end of multiline
