@@ -243,7 +243,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                 }
 
                 switch($($command[$i])) {
-                    " " {
+                    {$_ -in " ", "|"} {
                         $firstSpace = $true
                         #White
                         $color = $colorText
@@ -260,7 +260,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                         #Green
                         $color = $colorVariable
                     }
-                    '"' {
+                    {$_ -in '"', "'"} {
                         if(-not ($firstQoute)) {
                             $firstQoute = $true
                         }else {
@@ -268,6 +268,9 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                         }
 
                         $color = $colParmValue
+                    }
+                    default {
+                        $color = $colorCommandName
                     }
                 }
                 
