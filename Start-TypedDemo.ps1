@@ -322,6 +322,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         } #elseif
         #END OF MULTILINE
         elseif ($command -eq "::" -AND !$NoMultiLine) {
+            $firstSpace = $false
+            
             Write-host "`r"
             Write-Host ">> " -NoNewline
             $NoMultiLine = $True
@@ -344,6 +346,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         }  #elseif end of multiline
         #NESTED PROMPTS
         else {
+            $firstSpace = $false
+
             Write-Host "`r"
             Write-Host ">> " -NoNewLine
             If ((PauseIt) -eq "quit") {Return}
@@ -356,18 +360,28 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                 }
 
                 switch($($command[$i])) {
-                    {$_ -in " ", "|"} {
+                    " " {
                         $firstSpace = $true
                         #White
                         $color = $colorText
                     }
+                    "|" {
+                        $firstPipe = $true
+
+                        $color = $colorText
+                    }
+                    '`' {
+                        $previousColor = $color
+                        $color = $colorText
+                        Write-Verbose "$previousColor"
+                    }
                     {$_ -in "-", "–"} {
-                        # if($firstSpace) {
+                        #if($firstSpace) {
                             if(-not ($firstQoute)) {
                                 #Dark Grey
                                 $color = $colorParam
                             }
-                        # }
+                        #}
                     }
                     "$"{
                         #Green
@@ -383,7 +397,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                         $color = $colParmValue
                     }
                     default {
-                        $color = $colorCommandName
+                        if($firstPipe) {
+                            $color = $colorCommandName
+                            $firstPipe = $false
+                        }
                     }
                 }
                 
@@ -396,6 +413,9 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                     # Write-Host $command[$i] -NoNewline 
                     Write-PSFHostColor -String "<c='$color'>$char</c>" -NoNewLine
 
+                    if($char -eq '`') {
+                        $color = $previousColor
+                    }
                 }
 
                 Start-Sleep -Milliseconds $(&$Interval)
