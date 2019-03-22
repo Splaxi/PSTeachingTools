@@ -171,13 +171,16 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
                 switch($($command[$i])) {
                     " " {
+                        if(-not ($firstPipe))
+                        {
                         $firstSpace = $true
                         #White
                         $color = $colorText
+                        }
                     }
                     "|" {
                         $firstPipe = $true
-
+                        $firstSpace = $false
                         $color = $colorText
                     }
                     {$_ -in "-", "–"} {
@@ -259,13 +262,16 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
                 switch($($command[$i])) {
                     " " {
+                        if(-not ($firstPipe))
+                        {
                         $firstSpace = $true
                         #White
                         $color = $colorText
+                        }
                     }
                     "|" {
                         $firstPipe = $true
-
+                        $firstSpace = $false
                         $color = $colorText
                     }
                     {$_ -in "-", "–"} {
@@ -366,13 +372,16 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
                 switch($($command[$i])) {
                     " " {
+                        if(-not ($firstPipe))
+                        {
                         $firstSpace = $true
                         #White
                         $color = $colorText
+                        }
                     }
                     "|" {
                         $firstPipe = $true
-
+                        $firstSpace = $false
                         $color = $colorText
                     }
                     '`' {
