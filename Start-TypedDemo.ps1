@@ -61,7 +61,7 @@ Function Start-TypedDemo {
     #strip out all comments and blank lines
     Write-Verbose "Getting commands from $file"
 
-    $commands = Get-Content -Path $file | Where {$_ -notmatch "#" -AND $_ -match "\w|::|{|}|\(|\)"}
+    $commands = Get-Content -Path $file | Where-Object {$_ -notmatch "#" -AND $_ -match "\w|::|{|}|\(|\)"}
 
     $count = 0
 
