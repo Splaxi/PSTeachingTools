@@ -19,6 +19,7 @@ Function Start-TypedDemo {
         [Parameter(ParameterSetName = "Random")]
         [string]$Transcript,
         [switch]$NoExecute,
+        [switch]$SilentRun,
         [switch]$NewSession
     )
 
@@ -155,7 +156,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         $firstQoute = $false
         $firstPipe = $false
 
-    $color = $colorCommandName
+        $color = $colorCommandName
 
         # Write-Host "Hit foreach"
         #SINGLE LINE COMMAND
@@ -242,10 +243,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
             $command = $command -replace "þ", ""
 
-            if (-NOT $NoExecute) {
+            if ((-not $NoExecute) -and (-not $SilentRun)) {
                 Invoke-Expression $command | Out-Default
             }
-            else {
+            elseif($NoExecute) {
                 Write-Host $command -ForegroundColor Cyan
             }
         } #IF SINGLE COMMAND
@@ -358,11 +359,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
             $multi = $multi -replace "þ", ""
             $multi = $multi -replace '`', ""
             
-            if (-NOT $NoExecute) {
-            
+            if ((-not $NoExecute) -and (-not $SilentRun)) {
                 Invoke-Expression $multi | Out-Default
             }
-            else {
+            elseif($NoExecute) {
                 Write-Host $multi -ForegroundColor Cyan
             }
         }  #elseif end of multiline
