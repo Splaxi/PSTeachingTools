@@ -66,24 +66,14 @@ Function Start-TypedDemo {
     $count = 0
 
     #write a prompt using your current prompt function
-    Write-Verbose "prompt"
     Write-Host $(prompt) -NoNewline
 
-    $NoMultiLine = $True 
+    $NoMultiLine = $True
     $StartMulti = $False
 
-    #define a scriptblock to get typing interval
-    Write-Verbose "Defining interval scriptblock"
     $interval = {
-        if ($pscmdlet.ParameterSetName -eq "Random") {
-            #get a random pause interval
-            Get-Random -Minimum $RandomMinimum -Maximum $RandomMaximum
-        }
-        else {
-            #use the static pause value
             $Pause
-        }
-    } #end Interval scriptblock 
+    }
 
     Write-Verbose "Defining PipeCheck Scriptblock"
     #define a scriptblock to pause at a | character in case an explanation is needed
