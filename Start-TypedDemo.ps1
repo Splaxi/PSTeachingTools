@@ -22,6 +22,20 @@ Function Start-TypedDemo {
         [switch]$NewSession
     )
 
+    $colorParmsNotFound = "Red"
+    $colorCommandName = "Yellow"
+    $colorMandatoryParam = "Yellow"
+    $colorParam = "DarkGray"
+    $colorFoundAsterisk = "Green"
+    $colorNotFoundAsterisk = "Magenta"
+    $colParmValue = "DarkCyan"
+    $colorEqualSign = "DarkGray"
+    $colorVariable = "Green"
+    $colorText = "White"
+    $colorCommandNameSplat = "Yellow"
+    $colorComment = "DarkGreen"
+
+    
     #this is an internal function so I'm not worried about the name
     Function PauseIt {
         [cmdletbinding()]
@@ -136,9 +150,11 @@ Copyright (C) Microsoft Corporation. All rights reserved.
             If ((PauseIt) -eq "quit") {Return}
         }
    
+        $firstSpace = $false
+        $color = $colorCommandName
         #SINGLE LINE COMMAND
-        if ($command -ne "::" -AND $NoMultiLine) {  
-            Write-Verbose "single line command"          
+        if ($command -ne "::" -AND $NoMultiLine) {
+            Write-Verbose "single line command"
             for ($i = 0; $i -lt $command.length; $i++) {
      
                 &$PauseCharacterCheck
@@ -147,10 +163,33 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                     continue
                 }
 
+                switch($($command[$i])) {
+                    " " {
+                        $firstSpace = $true
+                        #White
+                        $color = $colorText
+                    }
+                    {$_ -in "-", "–"} {
+                        if($firstSpace) {
+                            #Dark Grey
+                            $color = $colorParam
+                        }
+                    }
+                    "$"{
+                        #Green
+                        $color = $colorVariable
+                    }
+                    '"' {
+                        $color = $colParmValue
+                    }
+                }
+                
+                Write-Verbose "$color"
+                $char = $command[$i]
                 #write the character
-                Write-Verbose "Writing character $($command[$i])"
-                Write-Host $command[$i] -NoNewline
-            
+                #Write-Verbose "Writing character $($command[$i])"
+                # Write-Host $command[$i] -NoNewline -ForegroundColor Yellow
+                Write-PSFHostColor -String "<c='$color'>$char</c>" -NoNewLine
                 #insert a pause to simulate typing
                 Start-sleep -Milliseconds $(&$Interval)
      
@@ -177,8 +216,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                 Write-Host $command -ForegroundColor Cyan
             }
         } #IF SINGLE COMMAND
-        #START MULTILINE  
-        #skip the ::     
+        #START MULTILINE
+        #skip the ::
         elseif ($command -eq "::" -AND $NoMultiLine) {
             $NoMultiLine = $False
             $StartMulti = $True
@@ -194,12 +233,12 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                     continue
                 }
 
-                if ($IncludeTypo -AND ($(&$Interval) -ge ($RandomMaximum - 5))) { 
-                    &$Typo 
-                } 
-                else { 
+                if ($IncludeTypo -AND ($(&$Interval) -ge ($RandomMaximum - 5))) {
+                    &$Typo
+                }
+                else {
                     write-host $command[$i] -NoNewline
-                } 
+                }
                 
                 start-sleep -Milliseconds $(&$Interval)
                 
