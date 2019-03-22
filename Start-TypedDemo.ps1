@@ -201,6 +201,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                     default {
                         if($firstPipe) {
                             $color = $colorCommandName
+                            $firstPipe = $false
                         }
                     }
                 }
@@ -254,9 +255,14 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                 }
 
                 switch($($command[$i])) {
-                    {$_ -in " ", "|"} {
+                    " " {
                         $firstSpace = $true
                         #White
+                        $color = $colorText
+                    }
+                    "|" {
+                        $firstPipe = $true
+
                         $color = $colorText
                     }
                     {$_ -in "-", "–"} {
@@ -281,7 +287,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
                         $color = $colParmValue
                     }
                     default {
-                        $color = $colorCommandName
+                        if($firstPipe) {
+                            $color = $colorCommandName
+                            $firstPipe = $false
+                        }
                     }
                 }
                 
