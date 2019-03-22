@@ -149,7 +149,9 @@ Function Start-TypedDemo {
                     }
                     "$"{
                         #Green
-                        $color = $colorVariable
+                        if(-not ($firstQuote)) {
+                            $color = $colorVariable
+                        }
                     }
                     {$_ -in '"', "'"} {
                         if(-not ($firstQuote)) {
