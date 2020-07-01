@@ -5,9 +5,9 @@ Function Start-TypedDemo {
 
     Param(
         [Parameter(Position = 0, Mandatory = $True, HelpMessage = "Enter the name of a text file with your demo commands")]
-        [ValidateScript( {Test-Path $_})]
+        [ValidateScript( { Test-Path $_ })]
         [string]$File,
-        [ValidateScript( {$_ -gt 0})]
+        [ValidateScript( { $_ -gt 0 })]
         [Parameter(ParameterSetName = "Static")]
         [int]$Pause = 80,
         [ValidateSet('Execute', 'NoExecute', 'SilentRun')]
@@ -61,7 +61,7 @@ Function Start-TypedDemo {
     #strip out all comments and blank lines
     Write-Verbose "Getting commands from $file"
 
-    $commands = Get-Content -Path $file | Where-Object {$_ -NotMatch "#" -AND $_ -Match "\w|::|{|}|\(|\)"}
+    $commands = Get-Content -Path $file | Where-Object { $_ -NotMatch "#" -AND $_ -Match "\w|::|{|}|\(|\)" }
 
     $count = 0
 
@@ -72,19 +72,19 @@ Function Start-TypedDemo {
     $StartMulti = $False
 
     $interval = {
-            $Pause
+        $Pause
     }
 
     Write-Verbose "Defining PipeCheck Scriptblock"
     $PipeCheck = {
         if ($command[$i] -eq "|") {
-            If ((PauseIt) -eq "quit") {Return}
+            If ((PauseIt) -eq "quit") { Return }
         }
     }
 
     $PauseCharacterCheck = {
         If ($command[$i] -eq "þ") {
-            If ((PauseIt) -eq "quit") {Return}
+            If ((PauseIt) -eq "quit") { Return }
         }
     }
 
@@ -95,7 +95,7 @@ Function Start-TypedDemo {
 
         #pause until a key is pressed which will then process the next command
         if ($NoMultiLine) {
-            If ((PauseIt) -eq "quit") {Return}
+            If ((PauseIt) -eq "quit") { Return }
         }
    
         $firstSpace = $false
@@ -117,48 +117,56 @@ Function Start-TypedDemo {
                     continue
                 }
 
-                switch($($command[$i])) {
+                switch ($($command[$i])) {
                     " " {
-                        if(-not ($commandSeparatorActive) -and (-not ($firstQuote))){
+                        if (-not ($commandSeparatorActive) -and (-not ($firstQuote))) {
                             $firstSpace = $true
                             #White
                             $color = $colorText
                         }
                     }
                     "|" {
-                        if(-not ($firstQuote)) {
+                        if (-not ($firstQuote)) {
                             $commandSeparatorActive = $true
                             $firstSpace = $false
                             $color = $colorText
                         }
                     }
                     ";" {
-                        if(-not ($firstQuote)) {
+                        if (-not ($firstQuote)) {
                             $commandSeparatorActive = $true
                             $firstSpace = $false
                             $color = $colorText
                         }
                     }
-                    {$_ -in "-", "–"} {
-                        if($firstSpace) {
-                            if(-not ($firstQuote)) {
+                    "=" {
+                        if (-not ($firstQuote)) {
+                            $commandSeparatorActive = $true
+                            $firstSpace = $false
+                            $color = $colorParam
+                        }
+                    }
+                    { $_ -in "-", "–" } {
+                        if ($firstSpace) {
+                            if (-not ($firstQuote)) {
                                 #Dark Grey
                                 $color = $colorParam
                             }
                         }
                     }
-                    "$"{
+                    "$" {
                         #Green
-                        if(-not ($firstQuote)) {
+                        if (-not ($firstQuote)) {
                             $color = $colorVariable
                         }
                     }
-                    {$_ -in '"', "'"} {
-                        if(-not ($firstQuote)) {
+                    { $_ -in '"', "'" } {
+                        if (-not ($firstQuote)) {
                             $firstQuote = $true
                             $QuoteChar = $_
-                        }else {
-                            if($QuoteChar -eq $_) {
+                        }
+                        else {
+                            if ($QuoteChar -eq $_) {
                                 $firstQuote = $false
                                 $QuoteChar = ""
                             }
@@ -167,7 +175,7 @@ Function Start-TypedDemo {
                         $color = $colParmValue
                     }
                     default {
-                        if($commandSeparatorActive) {
+                        if ($commandSeparatorActive) {
                             $color = $colorCommandName
                             $commandSeparatorActive = $false
                         }
@@ -192,7 +200,7 @@ Function Start-TypedDemo {
             }
     
             #Pause until ready to run the command
-            If ((PauseIt) -eq "quit") {Return}
+            If ((PauseIt) -eq "quit") { Return }
             Write-host "`r"
             #execute the command unless -NoExecute was specified
 
@@ -201,7 +209,7 @@ Function Start-TypedDemo {
             if ($RunMode -eq "Execute") {
                 Invoke-Expression $command | Out-Default
             }
-            elseif($RunMode -eq "NoExecute") {
+            elseif ($RunMode -eq "NoExecute") {
                 Write-Host $command -ForegroundColor Cyan
             }
         } #IF SINGLE COMMAND
@@ -222,48 +230,56 @@ Function Start-TypedDemo {
                     continue
                 }
 
-                switch($($command[$i])) {
+                switch ($($command[$i])) {
                     " " {
-                        if(-not ($commandSeparatorActive) -and (-not ($firstQuote))){
+                        if (-not ($commandSeparatorActive) -and (-not ($firstQuote))) {
                             $firstSpace = $true
                             #White
                             $color = $colorText
                         }
                     }
                     "|" {
-                        if(-not ($firstQuote)) {
+                        if (-not ($firstQuote)) {
                             $commandSeparatorActive = $true
                             $firstSpace = $false
                             $color = $colorText
                         }
                     }
                     ";" {
-                        if(-not ($firstQuote)) {
+                        if (-not ($firstQuote)) {
                             $commandSeparatorActive = $true
                             $firstSpace = $false
                             $color = $colorText
                         }
                     }
-                    {$_ -in "-", "–"} {
-                        if($firstSpace) {
-                            if(-not ($firstQuote)) {
+                    "=" {
+                        if (-not ($firstQuote)) {
+                            $commandSeparatorActive = $true
+                            $firstSpace = $false
+                            $color = $colorParam
+                        }
+                    }
+                    { $_ -in "-", "–" } {
+                        if ($firstSpace) {
+                            if (-not ($firstQuote)) {
                                 #Dark Grey
                                 $color = $colorParam
                             }
                         }
                     }
-                    "$"{
+                    "$" {
                         #Green
-                        if(-not ($firstQuote)) {
+                        if (-not ($firstQuote)) {
                             $color = $colorVariable
                         }
                     }
-                    {$_ -in '"', "'"} {
-                        if(-not ($firstQuote)) {
+                    { $_ -in '"', "'" } {
+                        if (-not ($firstQuote)) {
                             $firstQuote = $true
                             $QuoteChar = $_
-                        }else {
-                            if($QuoteChar -eq $_) {
+                        }
+                        else {
+                            if ($QuoteChar -eq $_) {
                                 $firstQuote = $false
                                 $QuoteChar = ""
                             }
@@ -272,7 +288,7 @@ Function Start-TypedDemo {
                         $color = $colParmValue
                     }
                     default {
-                        if($commandSeparatorActive) {
+                        if ($commandSeparatorActive) {
                             $color = $colorCommandName
                             $commandSeparatorActive = $false
                         }
@@ -302,7 +318,7 @@ Function Start-TypedDemo {
             #add the command to the multiline variable
             $multi += " $command"
             if ($command -notmatch ',$|{$|}$|\|$|\($|`$') { $multi += " ; " }
-            If ((PauseIt) -eq "quit") {Return}
+            If ((PauseIt) -eq "quit") { Return }
         
         } #elseif
         #END OF MULTILINE
@@ -313,7 +329,7 @@ Function Start-TypedDemo {
             Write-host "`r"
             Write-Host ">> " -NoNewline
             $NoMultiLine = $True
-            If ((PauseIt) -eq "quit") {Return}
+            If ((PauseIt) -eq "quit") { Return }
             #execute the command unless -NoExecute was specified
 
             Write-Host "`r"
@@ -325,7 +341,7 @@ Function Start-TypedDemo {
             if ($RunMode -eq "Execute") {
                 Invoke-Expression $multi | Out-Default
             }
-            elseif($RunMode -eq "NoExecute") {
+            elseif ($RunMode -eq "NoExecute") {
                 Write-Host $multi -ForegroundColor Cyan
             }
         }  #elseif end of multiline
@@ -336,7 +352,7 @@ Function Start-TypedDemo {
 
             Write-Host "`r"
             Write-Host ">> " -NoNewLine
-            If ((PauseIt) -eq "quit") {Return}
+            If ((PauseIt) -eq "quit") { Return }
             for ($i = 0; $i -lt $command.length; $i++) {
 
                 &$PauseCharacterCheck
@@ -345,52 +361,60 @@ Function Start-TypedDemo {
                     continue
                 }
 
-                switch($($command[$i])) {
+                switch ($($command[$i])) {
                     " " {
-                        if(-not ($commandSeparatorActive) -and (-not ($firstQuote))){
+                        if (-not ($commandSeparatorActive) -and (-not ($firstQuote))) {
                             $firstSpace = $true
                             #White
                             $color = $colorText
                         }
                     }
                     "|" {
-                        if(-not ($firstQuote)) {
+                        if (-not ($firstQuote)) {
                             $commandSeparatorActive = $true
                             $firstSpace = $false
                             $color = $colorText
                         }
                     }
                     ";" {
-                        if(-not ($firstQuote)) {
+                        if (-not ($firstQuote)) {
                             $commandSeparatorActive = $true
                             $firstSpace = $false
                             $color = $colorText
+                        }
+                    }
+                    "=" {
+                        if (-not ($firstQuote)) {
+                            $commandSeparatorActive = $true
+                            $firstSpace = $false
+                            $color = $colorParam
                         }
                     }
                     '`' {
                         $previousColor = $color
                         $color = $colorText
                     }
-                    {$_ -in "-", "–"} {
-                        if(($firstSpace) -or ($i -eq 0)) {
-                            if(-not ($firstQuote)) {
+                    { $_ -in "-", "–" } {
+                        if (($firstSpace) -or ($i -eq 0)) {
+                            if (-not ($firstQuote)) {
                                 #Dark Grey
                                 $color = $colorParam
                             }
                         }
                     }
-                    "$"{
+                    "$" {
                         #Green
-                        if(-not ($firstQuote)) {
+                        if (-not ($firstQuote)) {
                             $color = $colorVariable
                         }
                     }
-                    {$_ -in '"', "'"} {
-                        if(-not ($firstQuote)) {
+                    { $_ -in '"', "'" } {
+                        if (-not ($firstQuote)) {
                             $firstQuote = $true
                             $QuoteChar = $_
-                        }else {
-                            if($QuoteChar -eq $_) {
+                        }
+                        else {
+                            if ($QuoteChar -eq $_) {
                                 $firstQuote = $false
                                 $QuoteChar = ""
                             }
@@ -399,7 +423,7 @@ Function Start-TypedDemo {
                         $color = $colParmValue
                     }
                     default {
-                        if($commandSeparatorActive) {
+                        if ($commandSeparatorActive) {
                             $color = $colorCommandName
                             $commandSeparatorActive = $false
                         }
@@ -408,11 +432,11 @@ Function Start-TypedDemo {
                 
                 $char = $command[$i]
 
-                    Write-PSFHostColor -String "<c='$color'>$char</c>" -NoNewLine
+                Write-PSFHostColor -String "<c='$color'>$char</c>" -NoNewLine
 
-                    if($char -eq '`') {
-                        $color = $previousColor
-                    }
+                if ($char -eq '`') {
+                    $color = $previousColor
+                }
 
                 Start-Sleep -Milliseconds $(&$Interval)
                 &$PipeCheck
