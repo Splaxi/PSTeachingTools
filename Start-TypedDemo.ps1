@@ -191,7 +191,7 @@ Function Start-TypedDemo {
                 $command = $command.Replace('`', "")
             }
     
-            #Pause until ready to run the command 
+            #Pause until ready to run the command
             If ((PauseIt) -eq "quit") {Return}
             Write-host "`r"
             #execute the command unless -NoExecute was specified
@@ -419,7 +419,7 @@ Function Start-TypedDemo {
             } #for
    
 
-            #add the command to the multiline variable and include the line break 
+            #add the command to the multiline variable and include the line break
             #character
             $multi += " $command"
     
