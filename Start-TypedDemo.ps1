@@ -154,7 +154,7 @@ Function Start-TypedDemo {
                             }
                         }
                     }
-                    "$" {
+                    { $_ -in "$", "@" } {
                         #Green
                         if (-not ($firstQuote)) {
                             $color = $colorVariable
@@ -267,7 +267,7 @@ Function Start-TypedDemo {
                             }
                         }
                     }
-                    "$" {
+                    { $_ -in "$", "@" } {
                         #Green
                         if (-not ($firstQuote)) {
                             $color = $colorVariable
@@ -402,7 +402,7 @@ Function Start-TypedDemo {
                             }
                         }
                     }
-                    "$" {
+                    { $_ -in "$", "@" } {
                         #Green
                         if (-not ($firstQuote)) {
                             $color = $colorVariable
@@ -458,6 +458,3 @@ Function Start-TypedDemo {
         }
     }
 }
-
-
-
